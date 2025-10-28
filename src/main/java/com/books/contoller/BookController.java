@@ -24,49 +24,25 @@ public class BookController {
         books.addAll(List.of(book1, book2, book3, book4));
     }
 
+    public void addBook(Book book) {
+        books.add(book);
+    }
+
     @GetMapping
     public List<Book> getBooks() {
         return books;
     }
 
-    @GetMapping("/{bookId}")
-    public Book getBookById(@PathVariable("bookId") Integer bookId) {
-        return books.get(bookId);
-    }
-
-    @GetMapping("/title/{title}")
+    @GetMapping("/{title}")
     public Book getBookByTitle(@PathVariable String title) {
-        for (Book book : books) {
-            if (book.getTitle().equalsIgnoreCase(title)) {
-                return book;
-            }
-        }
-        return null;
-    }
-
-    @GetMapping("/name/{bookName}")
-    public Book getBookByName(@PathVariable("bookName") String bookName) {
         return books.stream()
-                .filter(book -> book.getTitle().equalsIgnoreCase(bookName))
+                .filter(book -> book.getTitle().equalsIgnoreCase(title))
                 .findFirst()
                 .orElse(null);
     }
 
     @GetMapping("/filter")
-    public List<Book> getBookByCategory(@RequestParam(required = false) String category) {
-        if (category == null) return books;
-
-        List<Book> filteredBooks = new ArrayList<>();
-        for (Book book : books) {
-            if (book.getCategory().equalsIgnoreCase(category)) {
-                filteredBooks.add(book);
-            }
-        }
-        return filteredBooks;
-    }
-
-    @GetMapping("/find")
-    public List<Book> getFoundBook(@RequestParam(required = false) String category) {
+    public List<Book> filterByCategory(@RequestParam(required = false) String category) {
         if (category == null) return books;
 
         return books.stream().filter(book ->
@@ -81,14 +57,14 @@ public class BookController {
         if (!isMatched) books.add(newBook);
     }
 
-    @PutMapping("/update/{title}")
+    @PutMapping("/{title}")
     public void updateBook(@PathVariable String title, @RequestBody Book updatedBook) {
         books.stream()
                 .filter(book -> book.getTitle().equalsIgnoreCase(title))
                 .findFirst().ifPresent(foundBook -> books.set(books.indexOf(foundBook), updatedBook));
     }
 
-    @DeleteMapping("/delete/{title}")
+    @DeleteMapping("/{title}")
     public void deleteBook(@PathVariable String title) {
         books.stream()
                 .filter(book -> book.getTitle().equalsIgnoreCase(title))
